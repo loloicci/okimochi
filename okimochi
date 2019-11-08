@@ -24,6 +24,9 @@ fi
 cmd_version () {
     echo "okimochi: Spread your hashed okimochi messages, Manage them safely."
     echo "v1.0.0"
+    echo ""
+    echo "Report bugs to https://github.com/loloiccl/okimochi/issues"
+    echo "Lolo Iccl <oxisccl@gmail.com>"
 }
 
 cmd_hash () {
@@ -81,16 +84,10 @@ cmd_help () {
     echo "        Show this message."
     echo "    okimochi version"
     echo "        Show version information."
-    echo ""
-    echo "okimochi: Spread your hashed okimochi messages, Manage them safely."
-    echo ""
-    echo "Report bugs to https://github.com/loloiccl/okimochi/issues"
-    echo "Lolo Iccl <oxisccl@gmail.com>"
 }
 
-cmd_help_exit () {
+cmd_exit () {
     echo "Error: invalid command '$@' is passed." >&2
-    cmd_help "$@"
     exit 1
 }
 
@@ -106,6 +103,6 @@ case "$COMMAND" in
     help|--help) shift;                             cmd_help "$@";;
     version|--version) shift;                       cmd_version "$@";;
     init|show|ls|list|grep|delete|rm|remove|git)    cmd_pass "$@";;
-    *)                                              cmd_help_exit "$@";;
+    *)                                              cmd_exit "$@";;
 esac
 exit 0
