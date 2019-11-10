@@ -8,4 +8,5 @@ See `okimochi help`.
 okimochi depends on
 
 - `pass`: http://www.passwordstore.org/
+    - `gpg` or `gpg2` (pass depends on them)
 - `shasum`
