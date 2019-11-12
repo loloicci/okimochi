@@ -1,0 +1,61 @@
+#compdef okimochi
+
+_okimochi_entries() {
+    local prefix
+    prefix=${OKIMOCHI_STORE:-$HOME/.okimochi-store}
+    _values '' $(find -L ${prefix} -maxdepth 1 | sed -e "s#^${prefix}/##g" | \
+                     sed -e '/.gpg$/!d' | sed -e 's/.gpg$//g')
+}
+
+_okimochi() {
+    local cmd
+    if (( CURRENT > 2 )); then
+        cmd=${words[2]}
+        (( CURRENT-- ))
+        shift words
+        case "${cmd}" in
+            show)
+                _okimochi_entries
+                ;;
+            rm|delete|remove)
+                _arguments : \
+                           "-f[force deletion]" \
+                           "--force[force deletion]"
+                _okimochi_entries
+                ;;
+            git)
+                local -a subcmd
+                subcmd=(
+                    "init:Make okimochi store an git repository."
+                    "push:Push to the remote reposioty."
+                    "pull:Pull from the remote repository."
+                    "log:Show logs."
+                )
+                _describe -t commands 'pass git' subcmd
+                ;;
+        esac
+    else
+        local -a subcmd
+        subcmd=(
+            'init:Initialize okimochi storage and use gpg-ids for encryption.'
+            'hash:Hash okimochi message from stdin and store encryped it named whoe hash.'
+            'list:List hashes of all okimochi messages.'
+            'ls:List hashes of all okimochi messages.'
+            'show:Decrypt and show okimochi message with given hash.'
+            'grep:Search given pattern in all decrypted okimochi messages.'
+            'remove:Remove the okimochi message with given hash.'
+            'rm:Remove the okimochi message with given hash.'
+            'delete:Remove the okimochi message with given hash.'
+            'git:Execute following git command in okimochi store repository.'
+            'help:Show help messages.'
+            '--help:Show help messages.'
+            'version:Show version information.'
+            '--version:Show version information.'
+
+
+        )
+        _describe -t commands 'okimochi' subcmd
+    fi
+}
+
+_okimochi
