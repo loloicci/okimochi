@@ -54,16 +54,26 @@ cmd_hash () {
     echo "    Hash: $HASH"
 }
 
-cmd_pass () {
-    MSG="$($PASS_CMD "$@" 2>&1)"
+cmd_init () {
+    $PASS_CMD init "$@"
     RET="$?"
     if [ "$RET" != "0" ]; then
-        echo "Error in pass:" >&2
-        echo "$MSG" | sed -e "s/^/  /g" | \
-            sed -e 's/Try "pass init"/Try "okimochi init"/g'
+        echo "Error: Error in pass" >&2
         exit 1
     fi
-    echo "$MSG"
+}
+
+cmd_pass () {
+    if [ ! -d "${STORE}" ]; then
+        echo 'Error: okimochi store is empty. Try "okimochi init".' >&2
+        exit 1
+    fi
+    $PASS_CMD "$@"
+    RET="$?"
+    if [ "$RET" != "0" ]; then
+        echo "Error: Error in pass" >&2
+        exit 1
+    fi
 }
 
 cmd_help () {
@@ -102,7 +112,8 @@ case "$COMMAND" in
     hash) shift;                                    cmd_hash "$@";;
     help|--help) shift;                             cmd_help "$@";;
     version|--version) shift;                       cmd_version "$@";;
-    init|show|ls|list|grep|delete|rm|remove|git)    cmd_pass "$@";;
+    init) shift;                                    cmd_init "$@";;
+    show|ls|list|grep|delete|rm|remove|git)         cmd_pass "$@";;
     *)                                              cmd_exit "$@";;
 esac
 exit 0
