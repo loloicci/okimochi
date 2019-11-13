@@ -3,8 +3,9 @@
 _okimochi_entries() {
     local prefix
     prefix=${OKIMOCHI_STORE:-$HOME/.okimochi-store}
-    _values '' $(find -L ${prefix} -maxdepth 1 | sed -e "s#^${prefix}/##g" | \
-                     sed -e '/.gpg$/!d' | sed -e 's/.gpg$//g')
+    _values '' $(find ${prefix} -type d -name .git -prune -o -type f -print |\
+                     sed -e '/.gpg$/!d' | \
+                     sed -e "s#^${prefix}/##g" | sed -e 's/.gpg$//g')
 }
 
 _okimochi() {
