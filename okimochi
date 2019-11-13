@@ -54,6 +54,11 @@ cmd_hash () {
     echo "    Hash: $HASH"
 }
 
+cmd_list () {
+    find $STORE -type d -name .git -prune -o -type f -print |\
+        sed -e "/.gpg$/!d" | sed -e "s#^${STORE}/##g" | sed -e 's/.gpg$//g'
+}
+
 cmd_init () {
     $PASS_CMD init "$@"
     RET="$?"
@@ -114,8 +119,9 @@ case "$COMMAND" in
     hash) shift;                                    cmd_hash "$@";;
     help|--help) shift;                             cmd_help "$@";;
     version|--version) shift;                       cmd_version "$@";;
+    ls|list) shift;                                 cmd_list "$@";;
     init) shift;                                    cmd_init "$@";;
-    show|ls|list|grep|delete|rm|remove|git)         cmd_pass "$@";;
+    show|grep|delete|rm|remove|git)                 cmd_pass "$@";;
     *)                                              cmd_exit "$@";;
 esac
 exit 0
