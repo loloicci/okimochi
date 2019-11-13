@@ -23,7 +23,7 @@ fi
 
 cmd_version () {
     echo "okimochi: Spread your hashed okimochi messages, Manage them safely."
-    echo "v1.0.1"
+    echo "v1.1.0"
     echo ""
     echo "Report bugs to https://github.com/loloiccl/okimochi/issues"
     echo "Lolo Iccl <oxisccl@gmail.com>"
