@@ -23,35 +23,36 @@ fi
 
 cmd_version () {
     echo "okimochi: Spread your hashed okimochi messages, Manage them safely."
-    echo "v1.1.0"
+    echo "v1.1.1"
     echo ""
     echo "Report bugs to https://github.com/loloiccl/okimochi/issues"
     echo "Lolo Iccl <oxisccl@gmail.com>"
 }
 
 cmd_hash () {
-    echo "Enter the message and input EOF or Ctrl-D"
+    echo "Enter the message and input EOF or Ctrl-D" >&2
     MSG="$(cat -)"
     HASH="$(echo "$MSG" | $HASH_CMD | awk '{ print $1 }')"
     if [ -f "$STORE/$HASH.gpg" ] && ! [ "$1" == "-f" ]; then
         echo "" >&2
-        echo "Error in okimochi: Hash Conflicts"
+        echo "Error in okimochi: Hash Conflicts" >&2
         echo "    The hash is already in okimochi-storage." >&2
         echo "    If you want to overwrite, you can do with 'okimochi hash -f'" >&2
-        echo "    Hash: $HASH"
+        echo "    Hash: $HASH" >&2
         exit 1
     fi
     MSG="$(echo "$MSG" | $PASS_CMD insert -m "$HASH")"
     RET="$?"
     if [ "$RET" != "0" ]; then
-        echo "$MSG"
-        echo "Error in pass (message is in above)" >&2
+        echo "Error in pass" >&2
+        echo "$MSG" | sed -e "s/^/  /g" >&2
         exit 1
     fi
-    echo "$MSG" | sed -e "/^Enter contents of/d"
-    echo ""
-    echo "Succeed:"
-    echo "    Hash: $HASH"
+    echo "$MSG" | sed -e "/^Enter contents of/d" >&2
+    echo "" >&2
+    echo "Succeed:" >&2
+    echo "Hash:" >&2
+    echo "$HASH"
 }
 
 cmd_list () {
@@ -104,6 +105,12 @@ cmd_help () {
 }
 
 cmd_exit () {
+    if [ -z "$@" ]; then
+        echo "Error: No commands are specified." >&2
+        echo "" >&2
+        cmd_help >&2
+        exit 1
+    fi
     echo "Error: invalid command '$@' is passed." >&2
     exit 1
 }
