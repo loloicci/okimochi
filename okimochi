@@ -104,6 +104,12 @@ cmd_help () {
 }
 
 cmd_exit () {
+    if [ -z "$@" ]; then
+        echo "Error: No commands are specified." >&2
+        echo "" >&2
+        cmd_help >&2
+        exit 1
+    fi
     echo "Error: invalid command '$@' is passed." >&2
     exit 1
 }
