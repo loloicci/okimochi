@@ -1,11 +1,12 @@
-# Okimochi
+# okimochi
 
 Spread your hashed okimochi messages, Manage them safely.
 
 1. Enter your okimochi in `okimochi hash` to get your hashed okimochi.
 2. Spread and tweet your okimochi hash. 
-3. You can view your original okimochi with `okimochi show "<hash of okimochi>"`.
-4. Your friends can verify your original okimochi by hashing it.
+    + You can view your original okimochi with `okimochi show "<hash of okimochi>"`.
+    + Your friends can verify your original okimochi by hashing it.
+    + You can 
 
 ## Setup
 
@@ -17,12 +18,12 @@ Spread your hashed okimochi messages, Manage them safely.
 
 ### Initialization
 
-Run `okimochi init [-p <path_of_store>] "<your gpg-id>"`
+Run `okimochi init "<your gpg-id>"`
 
 + `<path_of_store>` defaults to `~/.okimochi-store`
 + Your gpg-id is a 64bit value in hex. Run `gpg --list-keys` to find it.
 
-You can also run `okimochi git` to make your storage a git repo.
+You can also run `okimochi git init` to make your storage a git repo.
 A new commit will be made every time you add a new okimochi.
 
 ## Usage
@@ -31,11 +32,10 @@ A new commit will be made every time you add a new okimochi.
 
 Run `okimochi hash`, then type a your okimochi.
 
-### Recover okimochi
+### Decrypt okimochi
 
 `okimochi show <hash of okimochi>` 
 
 ### Discover more
 
 See `okimochi help` for more details.
-
