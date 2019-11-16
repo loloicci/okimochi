@@ -1,5 +1,10 @@
 # Changelog
 
+## [v1.1.2] - 2019-11-17
+### Changed
+- [Refactoring] Replace space indents with tab in main script.
+
+
 ## [v1.1.1] - 2019-11-14
 ### Changed
 - Improve outputs of `okimochi hash`.

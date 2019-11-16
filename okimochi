@@ -26,7 +26,7 @@ fi
 cmd_version () {
 	cat <<-_EOF
 		okimochi: Spread your hashed okimochi messages, Manage them safely.
-		v1.1.1
+		v1.1.2
 
 		Report bugs to https://github.com/loloiccl/okimochi/issues
 		Lolo Iccl <oxisccl@gmail.com>
