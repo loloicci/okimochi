@@ -21,7 +21,7 @@ fi
 # BEGIN FUNCTIONS
 #
 
-cmd_version () {
+cmd_version() {
     echo "okimochi: Spread your hashed okimochi messages, Manage them safely."
     echo "v1.1.1"
     echo ""
@@ -29,7 +29,7 @@ cmd_version () {
     echo "Lolo Iccl <oxisccl@gmail.com>"
 }
 
-cmd_hash () {
+cmd_hash() {
     echo "Enter the message and input EOF or Ctrl-D" >&2
     MSG="$(cat -)"
     HASH="$(echo "$MSG" | $HASH_CMD | awk '{ print $1 }')"
@@ -53,14 +53,27 @@ cmd_hash () {
     echo "Succeed:" >&2
     echo "Hash:" >&2
     echo "$HASH"
+    if [ $TWEET -eq 1 ]; then
+        URL="https://twitter.com/intent/tweet?text=$HASH&hashtags=okimochi&url=https%3A%2F%2Fgithub.com%2Floloiccl%2Fokimochi"
+        echo $URL
+        if which xdg-open >/dev/null; then
+            xdg-open $URL
+        elif which gnome-open >/dev/null; then
+            gnome-open $URL
+        elif which open >/dev/null; then
+            open $URL
+        else
+            echo "open $URL in your browser to tweet"
+        fi
+    fi
 }
 
-cmd_list () {
-    find $STORE -type d -name .git -prune -o -type f -print |\
+cmd_list() {
+    find $STORE -type d -name .git -prune -o -type f -print |
         sed -e "/.gpg$/!d" | sed -e "s#^${STORE}/##g" | sed -e 's/.gpg$//g'
 }
 
-cmd_init () {
+cmd_init() {
     $PASS_CMD init "$@"
     RET="$?"
     if [ "$RET" != "0" ]; then
@@ -69,7 +82,7 @@ cmd_init () {
     fi
 }
 
-cmd_pass () {
+cmd_pass() {
     if [ ! -d "${STORE}" ]; then
         echo 'Error: okimochi store is empty. Try "okimochi init".' >&2
         exit 1
@@ -82,7 +95,7 @@ cmd_pass () {
     fi
 }
 
-cmd_help () {
+cmd_help() {
     echo "Usage:"
     echo "    okimochi init [gpg-ids]"
     echo "        Initialize okimochi storage and use gpg-ids for encryption."
@@ -104,7 +117,7 @@ cmd_help () {
     echo "        Show version information."
 }
 
-cmd_exit () {
+cmd_exit() {
     if [ -z "$@" ]; then
         echo "Error: No commands are specified." >&2
         echo "" >&2
@@ -121,14 +134,40 @@ cmd_exit () {
 
 PROGRAM="${0##*/}"
 COMMAND="$1"
+OPTION="$2"
+
+case "$OPTION" in
+"-t")
+    echo "tweet selected"
+    TWEET=1
+    ;;
+*) TWEET=0 ;;
+esac
 
 case "$COMMAND" in
-    hash) shift;                                    cmd_hash "$@";;
-    help|--help) shift;                             cmd_help "$@";;
-    version|--version) shift;                       cmd_version "$@";;
-    ls|list) shift;                                 cmd_list "$@";;
-    init) shift;                                    cmd_init "$@";;
-    show|grep|delete|rm|remove|git)                 cmd_pass "$@";;
-    *)                                              cmd_exit "$@";;
+hash)
+    shift
+    cmd_hash "$@"
+    ;;
+help | --help)
+    shift
+    cmd_help "$@"
+    ;;
+version | --version)
+    shift
+    cmd_version "$@"
+    ;;
+ls | list)
+    shift
+    cmd_list "$@"
+    ;;
+init)
+    shift
+    cmd_init "$@"
+    ;;
+show | grep | delete | rm | remove | git)
+    cmd_pass "$@"
+    ;;
+*) cmd_exit "$@" ;;
 esac
 exit 0
