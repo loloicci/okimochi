@@ -1,11 +1,11 @@
 #!/bin/bash
 
 if ! type pass &>/dev/null; then
-	cat >&2 <<-_EOF
+    cat >&2 <<-_EOF
 		'okimochi' depends on 'pass' (http://www.passwordstore.org/).
 		Install 'pass' first.
 	_EOF
-	exit 1
+    exit 1
 fi
 
 STORE="${OKIMOCHI_STORE:-$HOME/.okimochi-store}"
@@ -15,16 +15,16 @@ DEFAULT_HASH_CMD="shasum -a 256"
 HASH_CMD="${OKIMOCHI_HASH_CMD:-$DEFAULT_HASH_CMD}"
 
 if [ "$HASH_CMD" == "$DEFAULT_HASH_CMD" ] && ! type shasum &>/dev/null; then
-	echo "'okimochi' depends on 'sha256sum'." >&2
-	exit 1
+    echo "'okimochi' depends on 'sha256sum'." >&2
+    exit 1
 fi
 
 #
 # BEGIN FUNCTIONS
 #
 
-cmd_version () {
-	cat <<-_EOF
+cmd_version() {
+    cat <<-_EOF
 		okimochi: Spread your hashed okimochi messages, Manage them safely.
 		v1.1.2
 
@@ -33,12 +33,12 @@ cmd_version () {
 	_EOF
 }
 
-cmd_hash () {
-	echo "Enter the message and input EOF or Ctrl-D" >&2
-	MSG="$(cat -)"
-	HASH="$(echo "$MSG" | $HASH_CMD | awk '{ print $1 }')"
-	if [ -f "$STORE/$HASH.gpg" ] && ! [ "$1" == "-f" ]; then
-		cat >&2 <<-_EOF
+cmd_hash() {
+    echo "Enter the message and input EOF or Ctrl-D" >&2
+    MSG="$(cat -)"
+    HASH="$(echo "$MSG" | $HASH_CMD | awk '{ print $1 }')"
+    if [ -f "$STORE/$HASH.gpg" ] && ! [ "$1" == "-f" ]; then
+        cat >&2 <<-_EOF
 			Error in okimochi: Hash Conflicts
 
 			    The hash is already in okimochi-storage.
@@ -46,55 +46,55 @@ cmd_hash () {
 
 			    Hash: $HASH
 		_EOF
-		exit 1
-	fi
-	MSG="$(echo "$MSG" | $PASS_CMD insert -m "$HASH")"
-	RET="$?"
-	if [ "$RET" != "0" ]; then
-		{
-			echo "Error in pass"
-			echo "$MSG" | sed -e "s/^/  /g"
-		} >&2
-		exit 1
-	fi
-	{
-		echo "$MSG" | sed -e "/^Enter contents of/d"
-		echo ""
-		echo "Succeed:"
-		echo "Hash:"
-	} >&2
-	echo "$HASH"
+        exit 1
+    fi
+    MSG="$(echo "$MSG" | $PASS_CMD insert -m "$HASH")"
+    RET="$?"
+    if [ "$RET" != "0" ]; then
+        {
+            echo "Error in pass"
+            echo "$MSG" | sed -e "s/^/  /g"
+        } >&2
+        exit 1
+    fi
+    {
+        echo "$MSG" | sed -e "/^Enter contents of/d"
+        echo ""
+        echo "Succeed:"
+        echo "Hash:"
+    } >&2
+    echo "$HASH"
 }
 
-cmd_list () {
-	find $STORE -type d -name .git -prune -o -type f -print |\
-		sed -e "/.gpg$/!d" | sed -e "s#^${STORE}/##g" | sed -e 's/.gpg$//g'
+cmd_list() {
+    find $STORE -type d -name .git -prune -o -type f -print |
+        sed -e "/.gpg$/!d" | sed -e "s#^${STORE}/##g" | sed -e 's/.gpg$//g'
 }
 
-cmd_init () {
-	$PASS_CMD init "$@"
-	RET="$?"
-	if [ "$RET" != "0" ]; then
-		echo "Error: Error in pass" >&2
-		exit 1
-	fi
+cmd_init() {
+    $PASS_CMD init "$@"
+    RET="$?"
+    if [ "$RET" != "0" ]; then
+        echo "Error: Error in pass" >&2
+        exit 1
+    fi
 }
 
-cmd_pass () {
-	if [ ! -d "${STORE}" ]; then
-		echo 'Error: okimochi store is empty. Try "okimochi init".' >&2
-		exit 1
-	fi
-	$PASS_CMD "$@"
-	RET="$?"
-	if [ "$RET" != "0" ]; then
-		echo "Error: Error in pass" >&2
-		exit 1
-	fi
+cmd_pass() {
+    if [ ! -d "${STORE}" ]; then
+        echo 'Error: okimochi store is empty. Try "okimochi init".' >&2
+        exit 1
+    fi
+    $PASS_CMD "$@"
+    RET="$?"
+    if [ "$RET" != "0" ]; then
+        echo "Error: Error in pass" >&2
+        exit 1
+    fi
 }
 
-cmd_help () {
-	cat <<-_EOF
+cmd_help() {
+    cat <<-_EOF
 		Usage:
 		    okimochi init [gpg-ids]
 		        Initialize okimochi storage and use gpg-ids for encryption.
@@ -117,15 +117,15 @@ cmd_help () {
 	_EOF
 }
 
-cmd_exit () {
-	if [ -z "$@" ]; then
-		echo "Error: No commands are specified." >&2
-		echo "" >&2
-		cmd_help >&2
-		exit 1
-	fi
-	echo "Error: invalid command '$@' is passed." >&2
-	exit 1
+cmd_exit() {
+    if [ -z "$@" ]; then
+        echo "Error: No commands are specified." >&2
+        echo "" >&2
+        cmd_help >&2
+        exit 1
+    fi
+    echo "Error: invalid command '$@' is passed." >&2
+    exit 1
 }
 
 #
@@ -134,14 +134,38 @@ cmd_exit () {
 
 PROGRAM="${0##*/}"
 COMMAND="$1"
+OPTION="$2"
+
+case "$OPTION" in
+"-t")
+    echo "tweet selected"
+    TWEET=1
+    ;;
+*) TWEET=0 ;;
+esac
 
 case "$COMMAND" in
-	hash) shift;                    	cmd_hash "$@";;
-	help|--help) shift;             	cmd_help "$@";;
-	version|--version) shift;       	cmd_version "$@";;
-	ls|list) shift;                 	cmd_list "$@";;
-	init) shift;                    	cmd_init "$@";;
-	show|grep|delete|rm|remove|git) 	cmd_pass "$@";;
-	*)                              	cmd_exit "$@";;
+hash)
+    shift
+    cmd_hash "$@"
+    ;;
+help | --help)
+    shift
+    cmd_help "$@"
+    ;;
+version | --version)
+    shift
+    cmd_version "$@"
+    ;;
+ls | list)
+    shift
+    cmd_list "$@"
+    ;;
+init)
+    shift
+    cmd_init "$@"
+    ;;
+show | grep | delete | rm | remove | git) cmd_pass "$@" ;;
+*) cmd_exit "$@" ;;
 esac
 exit 0
