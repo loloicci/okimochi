@@ -1,6 +1,8 @@
 #!/bin/bash
 
-if ! type pass &>/dev/null; then
+if which pass &>/dev/null; then
+	PASS=`which pass`
+else
 	cat >&2 <<-_EOF
 		'okimochi' depends on 'pass' (http://www.passwordstore.org/).
 		Install 'pass' first.
@@ -9,7 +11,7 @@ if ! type pass &>/dev/null; then
 fi
 
 STORE="${OKIMOCHI_STORE:-$HOME/.okimochi-store}"
-PASS_CMD="env PASSWORD_STORE_DIR=$STORE pass"
+PASS_CMD="env PASSWORD_STORE_DIR=${STORE} ${PASS}"
 DEFAULT_HASH_CMD="shasum -a 256"
 # HASH_CMD needs to output hash of input which can get with 'awk {print $1}'
 HASH_CMD="${OKIMOCHI_HASH_CMD:-$DEFAULT_HASH_CMD}"
