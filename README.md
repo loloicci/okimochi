@@ -20,8 +20,6 @@ Spread your hashed okimochi messages, Manage them safely.
 
 Run `okimochi init "<your gpg-ids>"`
 
-+ Your gpg-id is a 64bit value in hex. Run `gpg --list-keys` to find it.
-
 You can also run `okimochi git init` to make your storage a git repo.
 A new commit will be made every time you add or remove an okimochi.
 
