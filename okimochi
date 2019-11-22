@@ -1,7 +1,9 @@
 #!/bin/bash
 
-if ! type pass &>/dev/null; then
-    cat >&2 <<-_EOF
+if which pass &>/dev/null; then
+	PASS=`which pass`
+else
+	cat >&2 <<-_EOF
 		'okimochi' depends on 'pass' (http://www.passwordstore.org/).
 		Install 'pass' first.
 	_EOF
@@ -9,10 +11,19 @@ if ! type pass &>/dev/null; then
 fi
 
 STORE="${OKIMOCHI_STORE:-$HOME/.okimochi-store}"
-PASS_CMD="env PASSWORD_STORE_DIR=$STORE pass"
+PASS_CMD="env PASSWORD_STORE_DIR=${STORE} ${PASS}"
 DEFAULT_HASH_CMD="shasum -a 256"
 # HASH_CMD needs to output hash of input which can get with 'awk {print $1}'
 HASH_CMD="${OKIMOCHI_HASH_CMD:-$DEFAULT_HASH_CMD}"
+# set browser open command
+if which xdg-open >/dev/null;
+then URL_OPEN="xdg-open" 
+elif which gnome-open >/dev/null;
+then URL_OPEN="gnome-open"
+elif which open >/dev/null;
+then URL_OPEN="open" 
+else URL_OPEN="none" 
+fi
 
 if [ "$HASH_CMD" == "$DEFAULT_HASH_CMD" ] && ! type shasum &>/dev/null; then
     echo "'okimochi' depends on 'sha256sum'." >&2
@@ -64,6 +75,11 @@ cmd_hash() {
         echo "Hash:"
     } >&2
     echo "$HASH"
+	URL="https://twitter.com/intent/tweet?text=$HASH&hashtags=okimochi"
+	if [ $URL_OPEN -eq "none" ];
+	then echo "open $URL in your browser to tweet"
+	else $URL_OPEN $URL 
+	fi
 }
 
 cmd_list() {
